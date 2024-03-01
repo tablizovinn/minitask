@@ -1,5 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.Serialization;
+
+
+using Newtonsoft.Json;
 
 namespace Linq
 {
@@ -7,20 +12,34 @@ namespace Linq
     {
         static void Main(string[] args)
         {
-            List<Comsci> comsciStud = new List<Comsci>()
+            List<Student> comsciStud = new List<Student>()
             {
-                new Comsci() { Name = "Vin", ID = 12345, Section = "A"},
-                new Comsci() { Name = "Maxelle", ID = 114433, Section = "A"},
-                new Comsci() { Name = "JP", ID = 11345, Section = "B"},
-                new Comsci() { Name = "Arman", ID = 54321, Section = "A"},
-                new Comsci() { Name = "Johnny", ID = 98765, Section = "A"},
-                new Comsci() { Name = "Devina", ID = 67890, Section = "B"},
-                new Comsci() { Name = "James", ID = 77777, Section = "A"},
-                new Comsci() { Name = "JD", ID = 88888, Section = "A"},
-                new Comsci() { Name = "Cha", ID = 99999, Section = "B"}
+                new Student() { Name = "Vin", ID = 12345, Section = "A"},
+                new Student() { Name = "Maxelle", ID = 114433, Section = "A"},
+                new Student() { Name = "JP", ID = 11345, Section = "B"},
+                new Student() { Name = "Arman", ID = 54321, Section = "A"},
+                new Student() { Name = "Johnny", ID = 98765, Section = "A"},
+                new Student() { Name = "Devina", ID = 67890, Section = "B"},
+                new Student() { Name = "James", ID = 77777, Section = "A"},
+                new Student() { Name = "JD", ID = 88888, Section = "A"},
+                new Student() { Name = "Cha", ID = 99999, Section = "B"}
             };
 
-            Dictionary<int, Comsci> studentDictionary = new Dictionary<int, Comsci>();
+
+           
+
+            comsciStud[0].EnrolledCourse = new Course(13232, "Computer Science");
+            comsciStud[1].EnrolledCourse = new Course(13232, "Computer Science");
+            comsciStud[2].EnrolledCourse = new Course(13232, "Computer Science");
+            comsciStud[3].EnrolledCourse = new Course(13232, "Computer Science");
+            comsciStud[4].EnrolledCourse = new Course(13232313, "Information Technology");
+            comsciStud[5].EnrolledCourse = new Course(13232, "Information System");
+            comsciStud[6].EnrolledCourse = new Course(13232, "Computer Science");
+            comsciStud[7].EnrolledCourse = new Course(13232313, "Information Technology");
+            comsciStud[8].EnrolledCourse = new Course(13232, "Information System");
+
+
+            Dictionary<int, Student> studentDictionary = new Dictionary<int, Student>();
 
             foreach (var student in comsciStud)
             {
@@ -38,6 +57,7 @@ namespace Linq
                 Console.WriteLine("2. Search for a student by ID\n");
                 Console.WriteLine("3. Add student\n");
                 Console.WriteLine("4. Delete student\n");
+                Console.WriteLine("5. Json Output\n");
                 Console.Write("\nEnter option number: ");
 
                 // Read user input
@@ -50,14 +70,28 @@ namespace Linq
                         displayStud.Display();
                         break;
                     case "2":
-                        StudentDirectories studentSelect = new StudentDirectories(studentDictionary);
+                        Studentselect studentSelect = new Studentselect(studentDictionary);
                         studentSelect.Select();
                         break;
                     case "3":
                         AddStudent(comsciStud);
                         break;
                     case "4":
-                        deleteStudent(studentDictionary, comsciStud);
+                        DeleteStudent(studentDictionary, comsciStud);
+                        break;
+                    case "5":
+
+                        
+                            string json = JsonConvert.SerializeObject(comsciStud, Formatting.Indented);
+                            Console.WriteLine(json);
+
+                            foreach(var list in comsciStud)
+                        {
+                            string json1 = JsonConvert.SerializeObject(list, Formatting.Indented);
+                            Console.WriteLine(json1);
+                        }
+                      
+
                         break;
                     default:
                         Console.WriteLine("Invalid option.");
@@ -77,7 +111,7 @@ namespace Linq
         }
 
         // Function to add a new student to the list
-        static void AddStudent(List<Comsci> addStud)
+        static void AddStudent(List<Student> addStud)
         {
             Console.Write("Enter student name: ");
             string name = Console.ReadLine();
@@ -92,14 +126,14 @@ namespace Linq
             string section = Console.ReadLine();
 
             // Create a new student object and add it to the list
-            addStud.Add(new Comsci { Name = name, ID = id, Section = section });
+            addStud.Add(new Student { Name = name, ID = id, Section = section });
 
             Console.WriteLine("Student added successfully.");
         }
 
         //Function to delete student by ID
         
-        static void deleteStudent(Dictionary<int, Comsci> deleteStud, List<Comsci> comsciStud)
+        static void DeleteStudent(Dictionary<int, Student> deleteStud, List<Student> comsciStud)
         {
             Console.Write("Enter student ID to delete: ");
             int searchID;
@@ -110,7 +144,7 @@ namespace Linq
                     deleteStud.Remove(searchID);
 
                     //To check if the student is existing by their id
-                    Comsci studentToRemove = comsciStud.Find(student => student.ID == searchID);
+                    Student studentToRemove = comsciStud.Find(student => student.ID == searchID);
                     if (studentToRemove != null)
                     {
                         comsciStud.Remove(studentToRemove);
@@ -132,68 +166,5 @@ namespace Linq
             }
         }
 
-    }
-
-    // Class for BSCS-4A
-    class Comsci
-    {
-        public string Name { get; set; }
-        public int ID { get; set; }
-        public string Section { get; set; }
-    }
-
-    // Class to display the students
-    class Displaystud
-    {
-        private List<Comsci> Stud { get; set; }
-
-        public Displaystud(List<Comsci> students)
-        {
-            Stud = students;
-        }
-
-        // Function to display students
-        public void Display()
-        {
-            Console.WriteLine("\nAll Students:");
-            foreach (Comsci student in Stud)
-            {
-                Console.WriteLine($"Name: {student.Name}, ID: {student.ID}, Section: {student.Section}");
-            }
-        }
-    }
-
-    // Class to select student
-    class StudentDirectories
-    {
-        private Dictionary<int, Comsci> studentDictionary;
-
-        public StudentDirectories(Dictionary<int, Comsci> directories)
-        {
-            studentDictionary = directories;
-        }
-
-        // Function to select students by ID
-        public void Select()
-        {
-            Console.Write("Enter student ID: ");
-            int searchID;
-            if (int.TryParse(Console.ReadLine(), out searchID))
-            {
-                if (studentDictionary.ContainsKey(searchID))
-                {
-                    Comsci student = studentDictionary[searchID];
-                    Console.WriteLine($"Student found: Name: {student.Name}, ID: {student.ID}, Section: {student.Section}");
-                }
-                else
-                {
-                    Console.WriteLine("Student not found.");
-                }
-            }
-            else
-            {
-                Console.WriteLine("Invalid input. Please enter a valid integer.");
-            }
-        }
-    }
+    }  
 }
